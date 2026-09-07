@@ -1,0 +1,53 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="post-form">
+    <div class="post-header">
+        <span>{% if product %}Бараа засах{% else %}Шинэ бараа{% endif %}</span>
+        <button form="product-form" type="submit">{% if product %}Хадгалах{% else %}Нийтлэх{% endif %}</button>
+    </div>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+    {% if product and product.images %}
+    <div class="existing-images">
+        {% for img in product.images %}
+        <div class="existing-image-item">
+            <img src="{{ url_for('static', filename=img.path) }}">
+            <form method="POST" action="{{ url_for('admin_web.delete_product_image', product_id=product.id, image_id=img.id) }}">
+                <button type="submit" class="delete-btn">✕</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form id="product-form" method="POST" enctype="multipart/form-data">
+        <label class="image-picker">
+            <input type="file" name="images" multiple accept="image/*">
+            <span>{% if product %}Шинэ зураг нэмэх{% else %}Зураг сонгох (1-5){% endif %}</span>
+        </label>
+        <input type="text" name="name" placeholder="Барааны нэр" value="{{ product.name if product else '' }}" required>
+        <select name="category_id">
+            <option value="">Ангилалгүй</option>
+            {% for c in categories %}
+            <option value="{{ c.id }}" {% if product and product.category_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="price" placeholder="Үнэ" step="0.01" value="{{ product.price if product else '' }}" required>
+        <textarea name="description" placeholder="Барааны тухай товч мэдээлэл" rows="4">{{ product.description if product else '' }}</textarea>
+        <input type="text" name="contact_phone" placeholder="Утасны дугаар (заавал биш)" value="{{ product.contact_phone if product else '' }}">
+        <input type="text" name="contact_social" placeholder="Instagram/Facebook линк (заавал биш)" value="{{ product.contact_social if product else '' }}">
+    </form>
+
+    {% if not product %}
+    <details class="new-category">
+        <summary>+ Шинэ ангилал нэмэх</summary>
+        <form method="POST" action="{{ url_for('admin_web.new_category') }}">
+            <input type="text" name="name" placeholder="Ангиллын нэр">
+            <button type="submit">Нэмэх</button>
+        </form>
+    </details>
+    {% endif %}
+
+    <a href="{{ url_for('admin_web.manage_products') }}" class="back-link">← Бараануудаа харах</a>
+</div>
+{% endblock %}

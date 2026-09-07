@@ -1,0 +1,36 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="detail-page">
+    <a href="{{ url_for('storefront.home') }}" class="back-link">← Буцах</a>
+
+    {% if product.images %}
+    <div class="image-carousel detail-carousel">
+        {% for img in product.images %}
+        <img class="product-image" src="{{ url_for('static', filename=img.path) }}">
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="product-image detail-image"></div>
+    {% endif %}
+
+    <div class="detail-info">
+        <p class="detail-name">{{ product.name }}</p>
+        <p class="detail-price">{{ "{:,}".format(product.price|int) }}₮</p>
+        {% if product.description %}
+        <p class="detail-description">{{ product.description }}</p>
+        {% endif %}
+    </div>
+
+    {% if product.contact_phone or product.contact_social %}
+    <div class="contact-box">
+        <p class="contact-title">Холбоо барих</p>
+        {% if product.contact_phone %}
+        <a href="tel:{{ product.contact_phone }}" class="contact-link">{{ product.contact_phone }}</a>
+        {% endif %}
+        {% if product.contact_social %}
+        <a href="{{ product.contact_social }}" target="_blank" class="contact-link">{{ product.contact_social }}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

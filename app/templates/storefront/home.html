@@ -1,0 +1,55 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <p class="hero-tag reveal">EU · IMPORT · LIMITED</p>
+    <h1 class="hero-title reveal">MARKET <span class="accent">OFF</span></h1>
+    <button class="cta-btn reveal" id="ctaScroll">Дэлгүүр үзэх</button>
+    <div class="scroll-hint"><span></span></div>
+</section>
+
+{% if products %}
+<div class="featured-scroll reveal">
+    <p class="section-label">FEATURED</p>
+    <div class="featured-track">
+        {% for p in products[:6] %}
+        <a href="{{ url_for('storefront.product_detail', product_id=p.id) }}" class="featured-item">
+            {% if p.images %}
+            <img class="product-image" src="{{ url_for('static', filename=p.images[0].path) }}">
+            {% else %}
+            <div class="product-image"></div>
+            {% endif %}
+            <p class="featured-name">{{ p.name }}</p>
+            <p class="featured-price">{{ "{:,}".format(p.price|int) }}₮</p>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="category-bar reveal" id="grid-section">
+    <a href="{{ url_for('storefront.home') }}" class="chip {% if not selected_category %}active{% endif %}">Бүгд</a>
+    {% for c in categories %}
+    <a href="{{ url_for('storefront.home', category_id=c.id) }}" class="chip {% if selected_category == c.id %}active{% endif %}">{{ c.name }}</a>
+    {% endfor %}
+</div>
+
+<div class="product-grid">
+    {% for p in products %}
+    <a href="{{ url_for('storefront.product_detail', product_id=p.id) }}" class="product-card reveal">
+        {% if p.images %}
+        <div class="image-carousel">
+            {% for img in p.images %}
+            <img class="product-image" src="{{ url_for('static', filename=img.path) }}">
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="product-image"></div>
+        {% endif %}
+        <p class="product-name">{{ p.name }}</p>
+        <p class="product-price">{{ "{:,}".format(p.price|int) }}₮</p>
+    </a>
+    {% else %}
+    <p class="empty">Одоогоор бараа алга байна</p>
+    {% endfor %}
+</div>
+{% endblock %}

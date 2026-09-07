@@ -1,0 +1,51 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="manage-page">
+    <div class="post-header">
+        <span>Барааны удирдлага</span>
+        <a href="{{ url_for('admin_web.new_product_page') }}" class="add-link">+ Шинэ бараа</a>
+    </div>
+
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+    <details class="new-category">
+        <summary>Ангилал удирдах</summary>
+        <form method="POST" action="{{ url_for('admin_web.new_category') }}">
+            <input type="text" name="name" placeholder="Шинэ ангиллын нэр">
+            <button type="submit">Нэмэх</button>
+        </form>
+        <ul class="category-manage-list">
+            {% for c in categories %}
+            <li>
+                {{ c.name }}
+                <form method="POST" action="{{ url_for('admin_web.delete_category_web', category_id=c.id) }}" style="display:inline;">
+                    <button type="submit" class="delete-btn" onclick="return confirm('Устгах уу?')">Устгах</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </details>
+
+    <div class="product-manage-list">
+        {% for p in products %}
+        <div class="product-row">
+            {% if p.images %}
+            <img class="thumb" src="{{ url_for('static', filename=p.images[0].path) }}">
+            {% else %}
+            <div class="thumb"></div>
+            {% endif %}
+            <div class="product-row-info">
+                <p class="product-name">{{ p.name }}</p>
+                <p class="product-price">{{ "{:,}".format(p.price|int) }}₮</p>
+            </div>
+            <a href="{{ url_for('admin_web.edit_product_page', product_id=p.id) }}" class="edit-link">Засах</a>
+            <form method="POST" action="{{ url_for('admin_web.delete_product_web', product_id=p.id) }}">
+                <button type="submit" class="delete-btn" onclick="return confirm('Устгах уу?')">Устгах</button>
+            </form>
+        </div>
+        {% else %}
+        <p class="empty">Бараа алга байна</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
