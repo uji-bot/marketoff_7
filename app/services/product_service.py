@@ -93,3 +93,21 @@ def list_products(category_id: int = None, active_only: bool = True) -> list[Pro
     if active_only:
         query = query.filter_by(is_active=True)
     return query.order_by(Product.created_at.desc()).all()
+    category_id = data.get("category_id")
+    if category_id and not Category.query.get(category_id):
+        raise ProductError("Valid category is required")
+
+    stock_quantity = data.get("stock_quantity", 0)
+    if stock_quantity is None or stock_quantity < 0:
+        raise ProductError("Stock quantity must be zero or positive")
+
+    product = Product(
+        name=name,
+        description=data.get("description", ""),
+        price=price,
+        category_id=category_id or None,
+        is_active=data.get("is_active", True),
+        contact_phone=(data.get("contact_phone") or "").strip() or None,
+        contact_social=(data.get("contact_social") or "").strip() or None,
+        stock_quantity=stock_quantity,
+    )

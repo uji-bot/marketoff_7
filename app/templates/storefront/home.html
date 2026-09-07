@@ -18,6 +18,9 @@
             {% else %}
             <div class="product-image"></div>
             {% endif %}
+            {% if p.stock_quantity == 1 %}
+            <span class="badge-low-stock">Ганц үлдсэн</span>
+            {% endif %}
             <p class="featured-name">{{ p.name }}</p>
             <p class="featured-price">{{ "{:,}".format(p.price|int) }}₮</p>
         </a>
@@ -44,6 +47,9 @@
         </div>
         {% else %}
         <div class="product-image"></div>
+        {% endif %}
+        {% if p.stock_quantity == 1 %}
+        <span class="badge-low-stock">Ганц үлдсэн</span>
         {% endif %}
         <p class="product-name">{{ p.name }}</p>
         <p class="product-price">{{ "{:,}".format(p.price|int) }}₮</p>

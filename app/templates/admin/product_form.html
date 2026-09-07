@@ -33,6 +33,7 @@
             {% endfor %}
         </select>
         <input type="number" name="price" placeholder="Үнэ" step="0.01" value="{{ product.price if product else '' }}" required>
+        <input type="number" name="stock_quantity" placeholder="Тоо ширхэг" step="1" min="0" value="{{ product.stock_quantity if product else 0 }}" required>
         <textarea name="description" placeholder="Барааны тухай товч мэдээлэл" rows="4">{{ product.description if product else '' }}</textarea>
         <input type="text" name="contact_phone" placeholder="Утасны дугаар (заавал биш)" value="{{ product.contact_phone if product else '' }}">
         <input type="text" name="contact_social" placeholder="Instagram/Facebook линк (заавал биш)" value="{{ product.contact_social if product else '' }}">
@@ -51,3 +52,4 @@
     <a href="{{ url_for('admin_web.manage_products') }}" class="back-link">← Бараануудаа харах</a>
 </div>
 {% endblock %}
+

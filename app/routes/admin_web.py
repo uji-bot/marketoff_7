@@ -43,6 +43,7 @@ def new_product_page():
                 "description": request.form.get("description", ""),
                 "contact_phone": request.form.get("contact_phone", ""),
                 "contact_social": request.form.get("contact_social", ""),
+                "stock_quantity": int(request.form.get("stock_quantity", 0) or 0),
             })
             files = [f for f in request.files.getlist("images") if f.filename]
             if files:
@@ -79,6 +80,7 @@ def edit_product_page(product_id):
                 "description": request.form.get("description", ""),
                 "contact_phone": request.form.get("contact_phone", ""),
                 "contact_social": request.form.get("contact_social", ""),
+                "stock_quantity": int(request.form.get("stock_quantity", 0) or 0),
             })
 
             files = [f for f in request.files.getlist("images") if f.filename]
@@ -146,3 +148,4 @@ def delete_category_web(category_id):
     except CategoryError as e:
         return redirect(url_for("admin_web.manage_products", error=str(e)))
     return redirect(url_for("admin_web.manage_products"))
+
