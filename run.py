@@ -1,19 +1,15 @@
 ﻿import os
 from app import create_app, db
-from sqlalchemy import text
 
 app = create_app()
 
-# PostgreSQL URI-г SQLAlchemy-д тохирох хэлбэрт оруулж шинэчлэх
-db_url = os.environ.get("DATABASE_URL")
-if db_url and db_url.startswith("postgres://"):
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url.replace("postgres://", "postgresql://", 1)
-
 with app.app_context():
     try:
-        # Бааз руу хүчээр шууд холбогдож хүснэгтүүдийг шалгаж үүсгэнэ
+        # Хуучин зөрүүтэй хүснэгтүүдийг хүчээр бүгдийг устгана
+        db.drop_all()
+        # Шинэ кодын бүтцийн дагуу хүснэгтүүдийг дахин үүсгэнэ
         db.create_all()
-        print(">>> BAAZYNG KHUSNGETYUD AMJIL TTAI SHINECLEGDLEE <<<")
+        print(">>> BAAZYNG BUKH KHUSNGETIYIIG TGEES NI SHINICLIL EE <<<")
     except Exception as e:
         print(f">>> ERROR: {e} <<<")
 
