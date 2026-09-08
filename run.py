@@ -4,6 +4,10 @@ from app.services.auth_service import create_admin, AuthError
 
 app = create_app()
 
+# Сервер асах болгонд баазын хүснэгтүүдийг кодын дагуу шалгаж үүсгэнэ
+with app.app_context():
+    db.create_all()
+
 @app.cli.command("create-admin")
 def create_admin_command():
     import getpass
