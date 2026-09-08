@@ -6,6 +6,11 @@ from app.services.category_service import create_category, delete_category, list
 from app.services.product_service import create_product, update_product, delete_product, list_products, get_product, ProductError
 from app.services.image_service import save_images, delete_image, ImageError
 from app.services.auth_service import authenticate
+from app.models.product import Product
+from app.services.sale_service import (
+    record_sale, update_sale, delete_sale, SaleError,
+    get_sales_detail, get_sales_by_category, total_revenue,
+)
 
 admin_web_bp = Blueprint("admin_web", __name__, url_prefix="/admin")
 
@@ -120,6 +125,69 @@ def manage_products():
     return render_template("admin/products_list.html", products=products, categories=categories, error=error)
 
 
+@admin_web_bp.route("/products/<int:product_id>/sale", methods=["POST"])
+@login_required_web
+def record_sale_web(product_id):
+    try:
+        quantity = int(request.form.get("quantity", 1) or 1)
+        record_sale(product_id, quantity)
+    except (SaleError, ValueError):
+        pass
+    return redirect(url_for("admin_web.manage_products"))
+
+
+@admin_web_bp.route("/sales")
+@login_required_web
+def sales_report_page():
+    sales = get_sales_detail()
+    by_category = get_sales_by_category()
+    total = total_revenue()
+    products = list_products(active_only=False)
+    return render_template(
+        "admin/sales_report.html",
+        sales=sales, by_category=by_category, total=total, products=products,
+    )
+
+
+@admin_web_bp.route("/sales/add", methods=["POST"])
+@login_required_web
+def add_sale_web():
+    try:
+        name = request.form.get("product_name", "").strip()
+        product = Product.query.filter(Product.name.ilike(name)).first()
+        if not product:
+            return redirect(url_for("admin_web.sales_report_page"))
+        quantity = int(request.form.get("quantity", 1) or 1)
+        price = request.form.get("price")
+        price = float(price) if price else None
+        record_sale(product.id, quantity, price)
+    except (SaleError, ValueError, TypeError):
+        pass
+    return redirect(url_for("admin_web.sales_report_page"))
+
+
+@admin_web_bp.route("/sales/<int:sale_id>/edit", methods=["POST"])
+@login_required_web
+def edit_sale_web(sale_id):
+    try:
+        quantity = int(request.form.get("quantity", 1) or 1)
+        price = float(request.form.get("price", 0) or 0)
+        update_sale(sale_id, quantity=quantity, price=price)
+    except (SaleError, ValueError):
+        pass
+    return redirect(url_for("admin_web.sales_report_page"))
+
+
+@admin_web_bp.route("/sales/<int:sale_id>/delete", methods=["POST"])
+@login_required_web
+def delete_sale_web(sale_id):
+    try:
+        delete_sale(sale_id)
+    except SaleError:
+        pass
+    return redirect(url_for("admin_web.sales_report_page"))
+
+
 @admin_web_bp.route("/products/<int:product_id>/delete", methods=["POST"])
 @login_required_web
 def delete_product_web(product_id):
@@ -148,4 +216,3 @@ def delete_category_web(category_id):
     except CategoryError as e:
         return redirect(url_for("admin_web.manage_products", error=str(e)))
     return redirect(url_for("admin_web.manage_products"))
-

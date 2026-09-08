@@ -1,0 +1,123 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="manage-page">
+    <div class="post-header">
+        <span>Борлуулалтын тайлан</span>
+        <a href="{{ url_for('admin_web.manage_products') }}" class="add-link">← Бараанууд</a>
+    </div>
+
+    <p class="total-revenue">Нийт орлого: {{ "{:,}".format(total|int) }}₮</p>
+
+    <h3 class="section-label">Ангилалаар</h3>
+    <table class="excel-table">
+        <thead>
+            <tr>
+                <th>Ангилал</th>
+                <th>Тоо ширхэг</th>
+                <th>Орлого</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in by_category %}
+            <tr>
+                <td>{{ row.category_name or "Ангилалгүй" }}</td>
+                <td>{{ row.qty }}</td>
+                <td>{{ "{:,}".format(row.revenue|int) }}₮</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="empty">Борлуулалт алга байна</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="section-label">Дэлгэрэнгүй</h3>
+    <table class="excel-table" id="salesTable">
+        <thead>
+            <tr>
+                <th>Огноо</th>
+                <th>Бараа</th>
+                <th>Тоо ширхэг</th>
+                <th>Нэгжийн үнэ</th>
+                <th>Нийт дүн</th>
+                <th>Үйлдэл</th>
+            </tr>
+            <tr class="filter-row">
+                <th><input type="text" class="col-filter" data-col="0" placeholder="Хайх..." oninput="filterTable()"></th>
+                <th><input type="text" class="col-filter" data-col="1" placeholder="Хайх..." oninput="filterTable()"></th>
+                <th><input type="text" class="col-filter" data-col="2" placeholder="Хайх..." oninput="filterTable()"></th>
+                <th><input type="text" class="col-filter" data-col="3" placeholder="Хайх..." oninput="filterTable()"></th>
+                <th><input type="text" class="col-filter" data-col="4" placeholder="Хайх..." oninput="filterTable()"></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale, product in sales %}
+            <tr class="data-row">
+                <td data-value="{{ sale.sold_at.strftime("%Y-%m-%d %H:%M") }}">{{ sale.sold_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                <td data-value="{{ product.name|lower }}">{{ product.name }}</td>
+                <td data-value="{{ sale.quantity }}">
+                    <input type="number" name="quantity" value="{{ sale.quantity }}" min="1" step="1"
+                           class="excel-input" form="edit-sale-{{ sale.id }}">
+                </td>
+                <td data-value="{{ sale.price_at_sale }}">
+                    <input type="number" name="price" value="{{ sale.price_at_sale }}" min="0" step="0.01"
+                           class="excel-input" form="edit-sale-{{ sale.id }}">
+                </td>
+                <td data-value="{{ (sale.price_at_sale * sale.quantity)|int }}">{{ "{:,}".format((sale.price_at_sale * sale.quantity)|int) }}₮</td>
+                <td class="excel-actions">
+                    <button type="submit" form="edit-sale-{{ sale.id }}" class="edit-btn">Засах</button>
+                    <button type="submit" form="delete-sale-{{ sale.id }}" class="delete-btn"
+                            onclick="return confirm('Устгах уу?')">Устгах</button>
+                </td>
+            </tr>
+            <form id="edit-sale-{{ sale.id }}" method="POST"
+                  action="{{ url_for('admin_web.edit_sale_web', sale_id=sale.id) }}"></form>
+            <form id="delete-sale-{{ sale.id }}" method="POST"
+                  action="{{ url_for('admin_web.delete_sale_web', sale_id=sale.id) }}"></form>
+            {% else %}
+            <tr class="data-row"><td colspan="6" class="empty">Борлуулалт алга байна</td></tr>
+            {% endfor %}
+
+            <!-- Шинэ мөр нэмэх -->
+            <tr class="add-row">
+                <td>—</td>
+                <td>
+                    <input type="text" name="product_name" list="productNames" placeholder="Барааны нэр"
+                           class="excel-input" form="add-sale-form" autofocus>
+                    <datalist id="productNames">
+                        {% for p in products %}
+                        <option value="{{ p.name }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </td>
+                <td><input type="number" name="quantity" value="1" min="1" step="1" class="excel-input" form="add-sale-form"></td>
+                <td><input type="number" name="price" placeholder="(бараагийн үнэ)" min="0" step="0.01" class="excel-input" form="add-sale-form"></td>
+                <td>—</td>
+                <td><button type="submit" form="add-sale-form" class="edit-btn">+ Нэмэх</button></td>
+            </tr>
+            <form id="add-sale-form" method="POST" action="{{ url_for('admin_web.add_sale_web') }}"></form>
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterTable() {
+    var filters = document.querySelectorAll("#salesTable .col-filter");
+    var rows = document.querySelectorAll("#salesTable .data-row");
+
+    rows.forEach(function(row) {
+        var visible = true;
+        filters.forEach(function(filter) {
+            var col = filter.getAttribute("data-col");
+            var query = filter.value.toLowerCase().trim();
+            if (!query) return;
+            var cell = row.children[col];
+            var value = (cell.getAttribute("data-value") || cell.textContent || "").toLowerCase();
+            if (value.indexOf(query) === -1) visible = false;
+        });
+        row.style.display = visible ? "" : "none";
+    });
+}
+</script>{% endblock %}
+
+
