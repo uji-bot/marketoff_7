@@ -1,9 +1,8 @@
-﻿from app import create_app
-from app.extensions import db
+﻿import os
+from app import create_app, db
 from app.services.auth_service import create_admin, AuthError
 
 app = create_app()
-
 
 @app.cli.command("create-admin")
 def create_admin_command():
@@ -16,19 +15,6 @@ def create_admin_command():
     except AuthError as e:
         print(f"Error: {e}")
 
-
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True, host="0.0.0.0", port=5000)
-
-from app import create_app, db
-
-app = create_app()
-
-# Render дээр асахдаа Neon баазад хүснэгтүүдийг автоматаар үүсгэнэ
-with app.app_context():
-    db.create_all()
-
-if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
