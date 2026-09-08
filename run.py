@@ -4,10 +4,12 @@ from app.models.admin_user import AdminUser
 
 app = create_app()
 
+# Таннаас өгсөн Render-ийн SECRET_KEY
+app.config['SECRET_KEY'] = 'da29adc107d26e91ff5bc31a776257ed'
+
 with app.app_context():
     try:
         db.create_all()
-        # Burmaa7 админыг сервер асах бүрд шалгаж үүсгэнэ
         admin = AdminUser.query.filter_by(username='Burmaa7').first()
         if not admin:
             admin = AdminUser(username='Burmaa7')
@@ -15,7 +17,7 @@ with app.app_context():
         
         admin.set_password('Power@777')
         db.session.commit()
-        print(">>> ADMIN USER BURMAA7 IS READY <<<")
+        print(">>> ADMIN BURMAA7 READY WITH RENDER SECRET_KEY >>>")
     except Exception as e:
         print(f">>> ERROR: {e} <<<")
 
