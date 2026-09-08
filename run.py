@@ -1,15 +1,21 @@
 ﻿import os
 from app import create_app, db
+from app.models.admin_user import AdminUser
 
 app = create_app()
 
 with app.app_context():
     try:
-        # Хуучин зөрүүтэй хүснэгтүүдийг хүчээр бүгдийг устгана
-        db.drop_all()
-        # Шинэ кодын бүтцийн дагуу хүснэгтүүдийг дахин үүсгэнэ
         db.create_all()
-        print(">>> BAAZYNG BUKH KHUSNGETIYIIG TGEES NI SHINICLIL EE <<<")
+        # Burmaa7 админыг сервер асах бүрд шалгаж үүсгэнэ
+        admin = AdminUser.query.filter_by(username='Burmaa7').first()
+        if not admin:
+            admin = AdminUser(username='Burmaa7')
+            db.session.add(admin)
+        
+        admin.set_password('Power@777')
+        db.session.commit()
+        print(">>> ADMIN USER BURMAA7 IS READY <<<")
     except Exception as e:
         print(f">>> ERROR: {e} <<<")
 
