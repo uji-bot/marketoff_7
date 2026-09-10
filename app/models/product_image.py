@@ -14,23 +14,21 @@ class ProductImage(db.Model):
     position = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # ТАНЫ CLOUDINARY НЭРЭНД (`h7ujpdtm`) ТОХИРУУЛЖ ЗАССАН ХЭСЭГ:
+    # CLOUDINARY-ИЙН ЗӨВ СЕРВЕР ЗАМТАЙ ЭЦСИЙН ШИЙДЭЛ:
     @property
     def display_url(self) -> str:
         if not self.path:
             return "/static/images/no-image.png"
             
-        # 1. Хэрэв аль хэдийн бүтэн URL хаяг (http/https) хадгалагдсан байвал шууд буцаана
+        # 1. Хэрэв аль хэдийн бүтэн URL хаяг (http/https) байвал шууд буцаана
         if self.path.startswith('http://') or self.path.startswith('https://'):
             return self.path
             
-        # 2. Хэрэв өгөгдлийн санд зөвхөн Cloudinary-ийн ID нэр (жишээ нь: tdcwa1atpdqcfrqiwfvg.jpg) байвал
-        # Урд талд нь таны 'h7ujpdtm' cloud-ийн бүтэн унших замыг автоматаар залгаж өгнө.
+        # 2. Хэрэв өгөгдлийн санд зөвхөн ID нэр эсвэл 'marketoff/id.jpg' хэлбэрээр байвал
+        # Зөв хувилбар: ://cloudinary.com урд нь заавал байна!
         if '.' in self.path and not self.path.startswith('/'):
-            # Хэрэв фолдертой хадгалагдсан байвал (marketoff/id.jpg)
             if 'marketoff/' in self.path:
                 return f"https://cloudinary.com{self.path}"
-            # Хэрэв зөвхөн ID нь байвал фолдерийг нь залгаж өгнө
             return f"https://cloudinary.commarketoff/{self.path}"
             
         # 3. Хуучин локал хавтасны зураг бол хуучин замаар нь уншина
