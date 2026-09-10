@@ -5,3 +5,4 @@ __pycache__/
 .pytest_cache/
 app/static/images/*
 !app/static/images/.gitkeep
+.env
