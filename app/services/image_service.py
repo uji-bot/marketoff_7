@@ -1,11 +1,26 @@
+import os
+import cloudinary
+import cloudinary.uploader
 from app.extensions import db
 from app.models.product_image import ProductImage
 
 MAX_IMAGES = 5
 
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+    secure=True,
+)
+
 
 class ImageError(Exception):
     pass
+
+
+def upload_to_cloudinary(file) -> str:
+    result = cloudinary.uploader.upload(file, folder="marketoff")
+    return result["secure_url"]
 
 
 def save_images(product_id: int, paths: list[str]) -> list[ProductImage]:

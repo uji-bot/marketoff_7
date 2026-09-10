@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from app.decorators import login_required_web
 from app.services.category_service import create_category, delete_category, list_categories, CategoryError
 from app.services.product_service import create_product, update_product, delete_product, list_products, get_product, ProductError
-from app.services.image_service import save_images, delete_image, ImageError
+from app.services.image_service import save_images, delete_image, upload_to_cloudinary, ImageError
 from app.services.auth_service import authenticate
 from app.models.product import Product
 from app.services.sale_service import (
@@ -52,13 +52,8 @@ def new_product_page():
             })
             files = [f for f in request.files.getlist("images") if f.filename]
             if files:
-                os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-                saved_paths = []
-                for f in files:
-                    filename = secure_filename(f.filename)
-                    f.save(os.path.join(UPLOAD_FOLDER, filename))
-                    saved_paths.append(f"images/{filename}")
-                save_images(product.id, saved_paths)
+                uploaded_urls = [upload_to_cloudinary(f) for f in files]
+                save_images(product.id, uploaded_urls)
             return redirect(url_for("admin_web.manage_products"))
         except (ProductError, ImageError, ValueError) as e:
             error = str(e)
@@ -90,13 +85,8 @@ def edit_product_page(product_id):
 
             files = [f for f in request.files.getlist("images") if f.filename]
             if files:
-                os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-                saved_paths = []
-                for f in files:
-                    filename = secure_filename(f.filename)
-                    f.save(os.path.join(UPLOAD_FOLDER, filename))
-                    saved_paths.append(f"images/{filename}")
-                save_images(product.id, saved_paths)
+                uploaded_urls = [upload_to_cloudinary(f) for f in files]
+                save_images(product.id, uploaded_urls)
 
             return redirect(url_for("admin_web.manage_products"))
         except (ProductError, ImageError, ValueError) as e:

@@ -11,7 +11,7 @@
     <div class="existing-images">
         {% for img in product.images %}
         <div class="existing-image-item">
-            <img src="{{ url_for('static', filename=img.path) }}">
+            <img src="{{ img.path }}">
             <form method="POST" action="{{ url_for('admin_web.delete_product_image', product_id=product.id, image_id=img.id) }}">
                 <button type="submit" class="delete-btn">✕</button>
             </form>
@@ -52,4 +52,5 @@
     <a href="{{ url_for('admin_web.manage_products') }}" class="back-link">← Бараануудаа харах</a>
 </div>
 {% endblock %}
+
 

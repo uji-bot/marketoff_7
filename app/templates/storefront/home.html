@@ -42,7 +42,7 @@
         {% if p.images %}
         <div class="image-carousel">
             {% for img in p.images %}
-            <img class="product-image" src="{{ url_for('static', filename=img.path) }}">
+            <img class="product-image" src="{{ img.path }}">
             {% endfor %}
         </div>
         {% else %}
