@@ -14,50 +14,66 @@ def _slugify(name: str) -> str:
 
 
 def create_category(name: str) -> Category:
-    name = name.strip()
-    if not name:
-        raise CategoryError("Category name is required")
+    try:
+        name = name.strip()
+        if not name:
+            raise CategoryError("Категорийн нэр заавал хэрэгтэй")
 
-    slug = _slugify(name)
-    if Category.query.filter_by(slug=slug).first():
-        raise CategoryError(f"Category '{name}' already exists")
+        slug = _slugify(name)
+        if Category.query.filter_by(slug=slug).first():
+            raise CategoryError(f"'{name}' нэртэй категори аль хэдийн үүссэн байна")
 
-    category = Category(name=name, slug=slug)
-    db.session.add(category)
-    db.session.commit()
-    return category
+        category = Category(name=name, slug=slug)
+        db.session.add(category)
+        db.session.commit()
+        return category
+    except Exception as e:
+        db.session.rollback()
+        if not isinstance(e, CategoryError):
+            raise CategoryError(f"Категори үүсгэхэд алдаа гарлаа: {str(e)}")
+        raise e
 
 
 def rename_category(category_id: int, new_name: str) -> Category:
-    category = Category.query.get(category_id)
-    if not category:
-        raise CategoryError(f"Category {category_id} not found")
+    try:
+        category = Category.query.get(category_id)
+        if not category:
+            raise CategoryError(f"Категори {category_id} олдсонгүй")
 
-    new_name = new_name.strip()
-    if not new_name:
-        raise CategoryError("Category name is required")
+        new_name = new_name.strip()
+        if not new_name:
+            raise CategoryError("Категорийн нэр заавал хэрэгтэй")
 
-    new_slug = _slugify(new_name)
-    existing = Category.query.filter_by(slug=new_slug).first()
-    if existing and existing.id != category_id:
-        raise CategoryError(f"Category '{new_name}' already exists")
+        new_slug = _slugify(new_name)
+        existing = Category.query.filter_by(slug=new_slug).first()
+        if existing and existing.id != category_id:
+            raise CategoryError(f"'{new_name}' нэртэй категори аль хэдийн үүссэн байна")
 
-    category.name = new_name
-    category.slug = new_slug
-    db.session.commit()
-    return category
+        category.name = new_name
+        category.slug = new_slug
+        db.session.commit()
+        return category
+    except Exception as e:
+        db.session.rollback()
+        if not isinstance(e, CategoryError):
+            raise CategoryError(f"Категорийн нэр өөрчлөхөд алдаа гарлаа: {str(e)}")
+        raise e
 
 
 def delete_category(category_id: int) -> None:
-    category = Category.query.get(category_id)
-    if not category:
-        raise CategoryError(f"Category {category_id} not found")
+    try:
+        category = Category.query.get(category_id)
+        if not category:
+            raise CategoryError(f"Категори {category_id} олдсонгүй")
 
-    for product in category.products:
-        product.category_id = None
+        for product in category.products:
+            product.category_id = None
 
-    db.session.delete(category)
-    db.session.commit()
+        db.session.delete(category)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise CategoryError(f"Категори устгахад алдаа гарлаа: {str(e)}")
 
 
 def list_categories() -> list[Category]:

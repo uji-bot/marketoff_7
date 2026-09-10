@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from app.decorators import login_required_web
+from app.extensions import db
 from app.services.category_service import create_category, delete_category, list_categories, CategoryError
 from app.services.product_service import create_product, update_product, delete_product, list_products, get_product, ProductError
 from app.services.image_service import save_images, delete_image, upload_to_cloudinary, ImageError
@@ -122,7 +123,7 @@ def record_sale_web(product_id):
         quantity = int(request.form.get("quantity", 1) or 1)
         record_sale(product_id, quantity)
     except (SaleError, ValueError):
-        pass
+        db.session.rollback()
     return redirect(url_for("admin_web.manage_products"))
 
 
@@ -152,7 +153,7 @@ def add_sale_web():
         price = float(price) if price else None
         record_sale(product.id, quantity, price)
     except (SaleError, ValueError, TypeError):
-        pass
+        db.session.rollback()
     return redirect(url_for("admin_web.sales_report_page"))
 
 
@@ -164,7 +165,7 @@ def edit_sale_web(sale_id):
         price = float(request.form.get("price", 0) or 0)
         update_sale(sale_id, quantity=quantity, price=price)
     except (SaleError, ValueError):
-        pass
+        db.session.rollback()
     return redirect(url_for("admin_web.sales_report_page"))
 
 
@@ -174,7 +175,7 @@ def delete_sale_web(sale_id):
     try:
         delete_sale(sale_id)
     except SaleError:
-        pass
+        db.session.rollback()
     return redirect(url_for("admin_web.sales_report_page"))
 
 
