@@ -21,13 +21,12 @@ class Product(db.Model):
         cascade="all, delete-orphan", order_by="ProductImage.position"
     )
 
-    # Ухаалаг туслах функц: Хэрэв HTML дээр product.image_path эсвэл ганц тоогоор дуудвал
-    # Автоматаар хамгийн эхний зургийн замыг буцаана. Зураггүй бол default зураг заана.
+    # Засагдсан хувилбар: Жагсаалтын хамгийн эхний (0 дахь) элементийг зөв зааж авна
     @property
     def image_path(self) -> str:
         if self.images and len(self.images) > 0:
-            return self.images[0].path  # Эхний зургийн URL эсвэл локал замыг авна
-        return "/static/images/no-image.png"  # Зураггүй үед харуулах бэлэн зураг
+            return self.images[0].path  # Энд [0] гэж зөв зааж өгөв
+        return "/static/images/no-image.png"
 
     def __repr__(self):
         return f"<Product {self.name}>"
