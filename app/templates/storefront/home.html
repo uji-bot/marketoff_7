@@ -13,7 +13,7 @@
     <div class="featured-track">
         {% for p in products[:6] %}
         <a href="{{ url_for('storefront.product_detail', product_id=p.id) }}" class="featured-item">
-            <!-- ЭНД ӨӨРЧЛӨЛТ ОРСОН: url_for-ийг устгаж, манай моделийн ухаалаг image_path-ийг дуудав -->
+            <!-- ЭНД ӨӨРЧЛӨЛТ ОРСОН: p.image_path нь одоо display_url-ийг найдвартай уншина -->
             <img class="product-image" src="{{ p.image_path }}" alt="{{ p.name }}">
             
             {% if p.stock_quantity == 1 %}
@@ -40,11 +40,11 @@
         {% if p.images %}
         <div class="image-carousel">
             {% for img in p.images %}
-            <img class="product-image" src="{{ img.path }}" alt="{{ p.name }}">
+            <!-- ЭНД ӨӨРЧЛӨЛТ ОРСОН: img.path байсныг img.display_url болгож засав -->
+            <img class="product-image" src="{{ img.display_url }}" alt="{{ p.name }}">
             {% endfor %}
         </div>
         {% else %}
-        <!-- ЭНД ӨӨРЧЛӨЛТ ОРСОН: Зураггүй бол default зураг харуулна -->
         <img class="product-image" src="/static/images/no-image.png" alt="No Image">
         {% endif %}
         {% if p.stock_quantity == 1 %}
