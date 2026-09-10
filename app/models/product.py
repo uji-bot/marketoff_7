@@ -16,16 +16,17 @@ class Product(db.Model):
     stock_quantity = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Өгөгдлийн сан жагсаалт дуудах үед зургуудыг шууд цуг уншиж ирнэ
     images = db.relationship(
         "ProductImage", backref="product", lazy="joined",
         cascade="all, delete-orphan", order_by="ProductImage.position"
     )
 
-    # ЭНД ХАМГИЙН ЧУХАЛ ЗАСВАР ОРСОН:
+    # ТАНЫ АДМИН ХУУДАСНЫ ЗУРГИЙГ АМИЛУУЛАХ СҮҮЛИЙН ЗАСВАР:
     @property
     def image_path(self) -> str:
         if self.images and len(self.images) > 0:
-            # Жагсаалтын 0 дахь элементийн .display_url-ийг авна!
+            # Манай жагсаалтын хамгийн эхний (0 дахь) зургийн .display_url-ийг зөв зааж авна!
             return self.images[0].display_url  
         return "/static/images/no-image.png"
 
