@@ -16,16 +16,17 @@ class Product(db.Model):
     stock_quantity = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # ЭНД ӨӨРЧЛӨЛТ ОРСОН: lazy=True байсныг lazy='joined' болгож шинэчлэв.
+    # Ингэснээр жагсаалт дуудах үед зургуудыг өгөгдлийн сан шууд цуг уншиж ирнэ.
     images = db.relationship(
-        "ProductImage", backref="product", lazy=True,
+        "ProductImage", backref="product", lazy="joined",
         cascade="all, delete-orphan", order_by="ProductImage.position"
     )
 
-    # Засагдсан хувилбар: Жагсаалтын хамгийн эхний (0 дахь) элементийг зөв зааж авна
     @property
     def image_path(self) -> str:
         if self.images and len(self.images) > 0:
-            return self.images[0].path  # Энд [0] гэж зөв зааж өгөв
+            return self.images[0].path  # Эхний зургийн URL эсвэл локал замыг авна
         return "/static/images/no-image.png"
 
     def __repr__(self):
