@@ -16,16 +16,16 @@ class Product(db.Model):
     stock_quantity = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Жагсаалт дуудах үед зургуудыг өгөгдлийн сан шууд цуг уншиж ирнэ.
     images = db.relationship(
         "ProductImage", backref="product", lazy="joined",
         cascade="all, delete-orphan", order_by="ProductImage.position"
     )
 
-    # Найдвартай шинэ .display_url шинж чанарыг авна
+    # ЭНД ХАМГИЙН ЧУХАЛ ЗАСВАР ОРСОН:
     @property
     def image_path(self) -> str:
         if self.images and len(self.images) > 0:
+            # Жагсаалтын 0 дахь элементийн .display_url-ийг авна!
             return self.images[0].display_url  
         return "/static/images/no-image.png"
 
