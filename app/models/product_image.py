@@ -8,22 +8,18 @@ class ProductImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     
-    # Өгөгдлийн сангийн бодит баганы нэр 'path' хэвээрээ байна
-    _path = db.Column("path", db.String(300), nullable=False)
+    # Бодит баганы нэрийг 'path' хэвээр нь цэвэрхэн буцааж тавив. (Алдаа арилна)
+    path = db.Column(db.String(300), nullable=False)
     
     position = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Энгийн Python property болгож өөрчлөв (SQLAlchemy-ийг алдаа заалгахгүй)
+    # HTML темплэйтүүд дээр найдвартай унших шинэ ухаалаг шинж чанар
     @property
-    def path(self) -> str:
-        if self._path and (self._path.startswith('http://') or self._path.startswith('https://')):
-            return self._path  # Cloudinary URL бол шууд бүтнээр нь буцаана
-        return f"/static/images/{self._path}"  # Хуучин локал зураг бол замыг нь засна
-
-    @path.setter
-    def path(self, value: str):
-        self._path = value
+    def display_url(self) -> str:
+        if self.path and (self.path.startswith('http://') or self.path.startswith('https://')):
+            return self.path  # Cloudinary URL бол шууд бүтнээр нь буцаана
+        return f"/static/images/{self.path}"  # Хуучин локал зураг бол хавтасны замыг засна
 
     def __repr__(self):
-        return f"<ProductImage {self._path}>"
+        return f"<ProductImage {self.path}>"
